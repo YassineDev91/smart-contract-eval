@@ -1,0 +1,169 @@
+{
+  "name": "HotelInventory",
+  "x": 10,
+  "y": 10,
+  "variables": [
+    {
+      "name": "_room",
+      "type": {
+        "base": "string"
+      },
+      "visibility": "private"
+    },
+    {
+      "name": "_date",
+      "type": {
+        "base": "uint256"
+      },
+      "visibility": "private"
+    },
+    {
+      "name": "_price",
+      "type": {
+        "base": "uint256"
+      },
+      "visibility": "private"
+    },
+    {
+      "name": "_hotel",
+      "type": {
+        "base": "address",
+        "payable": true
+      },
+      "visibility": "private"
+    },
+    {
+      "name": "_balances",
+      "type": {
+        "base": "mapping",
+        "key": "address",
+        "value": "uint256"
+      },
+      "visibility": "private"
+    }
+  ],
+  "structs": [],
+  "constructor": {
+    "params": [
+      {
+        "name": "room",
+        "type": {
+          "base": "string"
+        }
+      },
+      {
+        "name": "date",
+        "type": {
+          "base": "uint256"
+        }
+      },
+      {
+        "name": "price",
+        "type": {
+          "base": "uint256"
+        }
+      },
+      {
+        "name": "hotel",
+        "type": {
+          "base": "address",
+          "payable": true
+        }
+      },
+      {
+        "name": "availability",
+        "type": {
+          "base": "uint256"
+        }
+      }
+    ],
+    "body": {
+      "type": "Block",
+      "statements": [
+        {
+          "type": "AssignmentStatement",
+          "expressions": [
+            {
+              "left": {
+                "type": "Variable",
+                "name": "_room"
+              },
+              "right": {
+                "type": "Identifier",
+                "value": "room"
+              }
+            }
+          ]
+        },
+        {
+          "type": "AssignmentStatement",
+          "expressions": [
+            {
+              "left": {
+                "type": "Variable",
+                "name": "_date"
+              },
+              "right": {
+                "type": "Identifier",
+                "value": "date"
+              }
+            }
+          ]
+        },
+        {
+          "type": "AssignmentStatement",
+          "expressions": [
+            {
+              "left": {
+                "type": "Variable",
+                "name": "_price"
+              },
+              "right": {
+                "type": "Identifier",
+                "value": "price"
+              }
+            }
+          ]
+        },
+        {
+          "type": "AssignmentStatement",
+          "expressions": [
+            {
+              "left": {
+                "type": "Variable",
+                "name": "_hotel"
+              },
+              "right": {
+                "type": "Identifier",
+                "value": "hotel"
+              }
+            }
+          ]
+        },
+        {
+          "type": "AssignmentStatement",
+          "expressions": [
+            {
+              "left": {
+                "type": "IndexAccess",
+                "object": "_balances",
+                "index": {
+                  "type": "Identifier",
+                  "value": "hotel"
+                }
+              },
+              "right": {
+                "type": "Identifier",
+                "value": "availability"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "functions": [],
+  "custom": {
+    "ai-hint": "Reservation-based pattern with validation and transfer logic"
+  }
+}

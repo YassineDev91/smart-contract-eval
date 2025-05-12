@@ -1,0 +1,471 @@
+{
+  "name": "BlindAuction",
+  "x": 10,
+  "y": 10,
+  "variables": [
+    {
+      "name": "beneficiary",
+      "type": {
+        "base": "address",
+        "payable": true
+      },
+      "visibility": "public",
+      "x": 50,
+      "y": 50
+    },
+    {
+      "name": "biddingEnd",
+      "type": {
+        "base": "uint"
+      },
+      "visibility": "public",
+      "x": 60,
+      "y": 80
+    },
+    {
+      "name": "revealEnd",
+      "type": {
+        "base": "uint"
+      },
+      "visibility": "public",
+      "x": 70,
+      "y": 110
+    },
+    {
+      "name": "ended",
+      "type": {
+        "base": "bool"
+      },
+      "visibility": "public",
+      "x": 80,
+      "y": 140
+    },
+    {
+      "name": "bids",
+      "type": {
+        "base": "mapping",
+        "key": "address",
+        "value": "Bid[]"
+      },
+      "visibility": "private",
+      "x": 90,
+      "y": 170
+    },
+    {
+      "name": "highestBidder",
+      "type": {
+        "base": "address"
+      },
+      "visibility": "public",
+      "x": 100,
+      "y": 200
+    },
+    {
+      "name": "highestBid",
+      "type": {
+        "base": "uint"
+      },
+      "visibility": "public",
+      "x": 110,
+      "y": 230
+    },
+    {
+      "name": "pendingReturns",
+      "type": {
+        "base": "mapping",
+        "key": "address",
+        "value": "uint"
+      },
+      "visibility": "private",
+      "x": 120,
+      "y": 260
+    }
+  ],
+  "structs": [
+    {
+      "name": "Bid",
+      "x": 150,
+      "y": 100,
+      "literals": [
+        {
+          "type": {
+            "base": "bytes32"
+          },
+          "name": "blindedBid",
+          "visibility": "public"
+        },
+        {
+          "type": {
+            "base": "uint"
+          },
+          "name": "deposit",
+          "visibility": "public"
+        }
+      ]
+    }
+  ],
+  "constructor": {
+    "params": [
+      {
+        "name": "biddingTime",
+        "type": {
+          "base": "uint"
+        }
+      },
+      {
+        "name": "revealTime",
+        "type": {
+          "base": "uint"
+        }
+      },
+      {
+        "name": "beneficiaryAddress",
+        "type": {
+          "base": "address",
+          "payable": true
+        }
+      }
+    ],
+    "body": {
+      "type": "Block",
+      "statements": [
+        {
+          "type": "AssignmentStatement",
+          "expressions": [
+            {
+              "left": {
+                "type": "Variable",
+                "name": "beneficiary"
+              },
+              "right": {
+                "type": "Identifier",
+                "value": "beneficiaryAddress"
+              }
+            }
+          ]
+        },
+        {
+          "type": "AssignmentStatement",
+          "expressions": [
+            {
+              "left": {
+                "type": "Variable",
+                "name": "biddingEnd"
+              },
+              "right": {
+                "type": "BinaryOperation",
+                "operator": "+",
+                "left": {
+                  "type": "Identifier",
+                  "value": "block.timestamp"
+                },
+                "right": {
+                  "type": "Identifier",
+                  "value": "biddingTime"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "AssignmentStatement",
+          "expressions": [
+            {
+              "left": {
+                "type": "Variable",
+                "name": "revealEnd"
+              },
+              "right": {
+                "type": "BinaryOperation",
+                "operator": "+",
+                "left": {
+                  "type": "Identifier",
+                  "value": "biddingEnd"
+                },
+                "right": {
+                  "type": "Identifier",
+                  "value": "revealTime"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "functions": [
+    {
+      "name": "bid",
+      "x": 200,
+      "y": 200,
+      "params": [
+        {
+          "name": "_blindedBid",
+          "type": {
+            "base": "bytes32"
+          }
+        }
+      ],
+      "modifiers": [
+        "external",
+        "payable",
+        "onlyBefore(biddingEnd)"
+      ],
+      "body": {
+        "type": "Block",
+        "statements": [
+          {
+            "type": "CallStatement",
+            "object": {
+              "type": "IndexAccess",
+              "object": "bids",
+              "index": {
+                "type": "Identifier",
+                "value": "msg.sender"
+              }
+            },
+            "method": "push",
+            "params": [
+              {
+                "type": "StructInit",
+                "struct": "Bid",
+                "values": {
+                  "blindedBid": "_blindedBid",
+                  "deposit": "msg.value"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "reveal",
+      "x": 200,
+      "y": 300,
+      "params": [
+        {
+          "name": "_values",
+          "type": {
+            "base": "uint[]"
+          }
+        },
+        {
+          "name": "_fake",
+          "type": {
+            "base": "bool[]"
+          }
+        },
+        {
+          "name": "_secret",
+          "type": {
+            "base": "bytes32[]"
+          }
+        }
+      ],
+      "modifiers": [
+        "external",
+        "onlyAfter(biddingEnd)",
+        "onlyBefore(revealEnd)"
+      ],
+      "body": {
+        "type": "Block",
+        "statements": [
+          {
+            "type": "VariableDeclaration",
+            "name": "bidsList",
+            "varType": {
+              "base": "Bid[]"
+            },
+            "value": {
+              "type": "IndexAccess",
+              "object": "bids",
+              "index": {
+                "type": "Identifier",
+                "value": "msg.sender"
+              }
+            }
+          },
+          {
+            "type": "ForStatement",
+            "init": {
+              "type": "AssignmentStatement",
+              "expressions": [
+                {
+                  "left": {
+                    "type": "Variable",
+                    "name": "i"
+                  },
+                  "right": {
+                    "type": "Literal",
+                    "value": 0
+                  }
+                }
+              ]
+            },
+            "condition": {
+              "type": "BinaryOperation",
+              "operator": "<",
+              "left": {
+                "type": "Identifier",
+                "value": "i"
+              },
+              "right": {
+                "type": "MemberAccess",
+                "object": "_values",
+                "member": "length"
+              }
+            },
+            "post": {
+              "type": "AssignmentStatement",
+              "expressions": [
+                {
+                  "left": {
+                    "type": "Variable",
+                    "name": "i"
+                  },
+                  "right": {
+                    "type": "BinaryOperation",
+                    "operator": "+",
+                    "left": {
+                      "type": "Identifier",
+                      "value": "i"
+                    },
+                    "right": {
+                      "type": "Literal",
+                      "value": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "body": {
+              "type": "Block",
+              "statements": [
+                {
+                  "type": "IfStatement",
+                  "condition": {
+                    "type": "BinaryOperation",
+                    "operator": ">=",
+                    "left": {
+                      "type": "Identifier",
+                      "value": "i"
+                    },
+                    "right": {
+                      "type": "MemberAccess",
+                      "object": "bidsList",
+                      "member": "length"
+                    }
+                  },
+                  "then": {
+                    "type": "Block",
+                    "statements": [
+                      {
+                        "type": "BreakStatement"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "auctionEnd",
+      "x": 200,
+      "y": 400,
+      "params": [],
+      "modifiers": [
+        "external",
+        "onlyAfter(revealEnd)"
+      ],
+      "body": {
+        "type": "Block",
+        "statements": [
+          {
+            "type": "IfStatement",
+            "condition": {
+              "type": "BinaryOperation",
+              "operator": "<",
+              "left": {
+                "type": "Identifier",
+                "value": "block.timestamp"
+              },
+              "right": {
+                "type": "Identifier",
+                "value": "revealEnd"
+              }
+            },
+            "then": {
+              "type": "Block",
+              "statements": [
+                {
+                  "type": "RevertStatement",
+                  "error": "TooEarly",
+                  "args": [
+                    "block.timestamp"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "type": "IfStatement",
+            "condition": {
+              "type": "Identifier",
+              "value": "ended"
+            },
+            "then": {
+              "type": "Block",
+              "statements": [
+                {
+                  "type": "RevertStatement",
+                  "error": "AuctionEndAlreadyCalled"
+                }
+              ]
+            }
+          },
+          {
+            "type": "AssignmentStatement",
+            "expressions": [
+              {
+                "left": {
+                  "type": "Variable",
+                  "name": "ended"
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": true
+                }
+              }
+            ]
+          },
+          {
+            "type": "EmitStatement",
+            "event": "AuctionEnded",
+            "args": [
+              "highestBidder",
+              "highestBid"
+            ]
+          },
+          {
+            "type": "CallStatement",
+            "object": "beneficiary",
+            "method": "transfer",
+            "params": [
+              {
+                "type": "Identifier",
+                "value": "highestBid"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "custom": {
+    "ai-hint": "Multi-phase auction with hidden bids and timed reveal logic"
+  }
+}
