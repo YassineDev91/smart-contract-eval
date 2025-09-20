@@ -104,7 +104,7 @@ It simulates the full lifecycle of the **RemotePurchase** use case, testing init
 cd hardhat-test
 npm install
 npx hardhat test
-
+```
 ---
 
 ## 📐 JSON Contract Format
