@@ -20,6 +20,11 @@ smart-contract-eval/
 │   └── HotelInventory.json
 ├── analysis_reports/           # Full analyzer output from slither and solc
 │   └── full_analysis_report.json
+├── hardhat-test/               # Runtime validation project using Hardhat v3
+│   ├── contracts/              # Smart contracts under test
+│   ├── test/                   
+│   ├── hardhat.config.ts       # Hardhat configuration
+│   └── package.json            
 ├── solidity_analyzer_combined.py  # Script to generate the evaluation report
 ├── README.md
 └── LICENSE
@@ -84,6 +89,24 @@ This will:
 
 ---
 
+### ⚡ Runtime Validation (Hardhat v3)
+
+The `hardhat-test` folder contains a standalone Hardhat v3 project used to validate the runtime behavior of generated contracts.  
+It simulates the full lifecycle of the **RemotePurchase** use case, testing initialization, `confirmPurchase`, `confirmReceived`, and `refundSeller` across all models (ChatGPT, Claude, Gemini, DeepSeek) against the Solidity reference implementation.
+
+#### Features:
+- Solidity-based test suite (`Purchase.t.sol`) for reproducible evaluation.
+- Cross-contract comparison to highlight functional differences between models.
+- Reports on runtime success/failure for each model.
+
+#### Running the Tests:
+```bash
+cd hardhat-test
+npm install
+npx hardhat test
+
+---
+
 ## 📐 JSON Contract Format
 
 The JSON files in `json-models/` follow a platform-agnostic metamodel:
@@ -108,7 +131,7 @@ The JSON files in `json-models/` follow a platform-agnostic metamodel:
 
 If you use this dataset or script, please cite:
 
-> *Yassine Naziha, 2025. Design and Development of Smart Contracts Using a Web-Based Graphical Editor and Large Language Models.*
+> *Yassine Naziha, 2025. SCEditor-Web: Bridging Model-Driven Engineering and Generative AI for Smart Contract Development*
 
 ---
 
